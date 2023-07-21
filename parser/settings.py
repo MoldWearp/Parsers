@@ -6,12 +6,18 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import os
+
+from Clients.Mongo import CustomMongoClient
 
 BOT_NAME = "parser"
 
 SPIDER_MODULES = ["parser.spiders"]
 NEWSPIDER_MODULE = "parser.spiders"
 
+uri = os.getenv("MONGO_URI")
+mongo_db = os.getenv("MONGO_DB")
+db = CustomMongoClient(uri, mongo_db)
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "parser (+http://www.yourdomain.com)"
