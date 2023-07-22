@@ -17,7 +17,10 @@ class VKPipeline:
     async def process_item(self, item, spider):
         logger.debug(f"item = {item}")
         item["metadata"]["cur_node"] += 1
+        graph = item["metadata"]["graph"]
+        cur_node = item["metadata"]["cur_node"]
 
+        # TODO Fixed the error on stage Finish
         json_kafka_message = {"id": item["id"], "metadata": item["metadata"]}
         kafka_message = json.dumps(json_kafka_message, default=json_util.default)
 
