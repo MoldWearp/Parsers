@@ -1,7 +1,6 @@
 import json
 from json.decoder import JSONDecodeError
 from typing import List
-from errors import JSONParseError
 from Clients.Kafka import KafkaCoreClient
 from kafka import KafkaConsumer
 from loguru import logger

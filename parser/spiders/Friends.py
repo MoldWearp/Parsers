@@ -11,7 +11,7 @@ load_dotenv()
 
 
 class UserSpider(scrapy.Spider):
-    name = "VKFriends"
+    name = "Friends"
 
     def __init__(self, *args, **kwargs):
         self.api_url = "https://api.vk.com"

@@ -11,22 +11,20 @@ class CustomMongoClient:
 
     def update(self, collection, document: dict, id):
         collection = self._db[collection]
-        metadata = document.pop("metadata")
         filter = {"id": id}
-        query = {'$set': {'metadata': metadata, **document}}
+        query = {'$set': document}
         collection.update_one(filter, query, upsert=True)
 
     def push_data(self, collection, document: dict, id):
         collection = self._db[collection]
-        metadata = document.pop("metadata")
         filter = {"id": id}
-        query = {'$push': {**document}}
+        query = {'$push': document}
         collection.update_one(filter, query, upsert=True)
 
     def take_data(self, collection, id):
         collection = self._db[collection]
         filter = {"id": id}
-        data = collection.find_one(id)
+        data = collection.find_one(filter)
         return data
 
 

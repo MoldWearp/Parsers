@@ -7,17 +7,31 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
+import sys
 
 from Clients.Mongo import CustomMongoClient
+from dotenv import load_dotenv
+from loguru import logger
 
 BOT_NAME = "parser"
 
 SPIDER_MODULES = ["parser.spiders"]
 NEWSPIDER_MODULE = "parser.spiders"
 
+load_dotenv()
+
 uri = os.getenv("MONGO_URI")
 mongo_db = os.getenv("MONGO_DB")
+
 db = CustomMongoClient(uri, mongo_db)
+
+
+DEBUG = os.getenv("DEBUG").lower() in ('true', '1', 't')
+
+if not DEBUG:
+    logger.remove()
+    logger.add(sys.stderr, level="INFO")
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "parser (+http://www.yourdomain.com)"

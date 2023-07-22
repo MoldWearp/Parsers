@@ -1,6 +1,5 @@
 from kafka import KafkaProducer
 from loguru import logger
-
 from Clients.Kafka import KafkaCoreClient
 
 
@@ -11,6 +10,7 @@ class KafkaProducerClient(KafkaCoreClient):
         self._connect()
 
     def _connect(self):
+        logger.info("Connecting the kafka")
         _producer = None
         try:
             _producer = KafkaProducer(bootstrap_servers=self._servers, api_version=(0, 10))
@@ -20,9 +20,11 @@ class KafkaProducerClient(KafkaCoreClient):
             self._producer = _producer
 
     def publish_message(self, topic_name, value):
+        logger.debug(f"sending to the {topic_name} the value {value}")
         try:
             value_bytes = bytes(value, encoding='utf-8')
             self._producer.send(topic_name, value=value_bytes)
+            self._producer.flush()
         except Exception as e:
             logger.error(f"Error at publishing message on topic {topic_name}, err = {e}")
 

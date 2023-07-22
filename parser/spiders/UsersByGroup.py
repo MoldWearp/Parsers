@@ -2,7 +2,7 @@ import json
 import os
 import pprint
 from parser.settings import db
-
+from loguru import logger
 import scrapy
 from dotenv import load_dotenv
 
@@ -22,11 +22,13 @@ class UserSpider(scrapy.Spider):
         self.group_fields = kwargs.get("group_fields") or ""
         self.group_extended = kwargs.get("group_extended") or 0
 
-        self.id = self.settings["unique_id"]
+        self.id = kwargs.get("id")
+        self.metadata = json.loads(kwargs["metadata"])
+
+        logger.info(f"starting the spider with id {self.id} and spider name {self.name}")
 
         self.data = db.take_data("storage", self.id)
         self.group_id = self.data["group"]["id"]
-        self.metadata = kwargs["metadata"]
 
         self.url = f"{self.api_url}/method/groups.getMembers/?group_id={self.group_id}&offset={self.offset}&v={self.api_version}" \
                    f"&access_token={self.access_token}"
@@ -38,11 +40,17 @@ class UserSpider(scrapy.Spider):
 
     def parse(self, response, **kwargs):
         self.log(f"parse users of {self.group_id} group")
-        item = {"metadata": self.metadata}
-        users = json.loads(response.text)['response']
-        item["groupsByUser"] = users
+        item = {}
 
-        db.update(item)
+        response = json.loads(response.text)
+        if "response" in response:
+            item["UsersByGroup"] = response['response']["items"]
+        else:
+            logger.debug(f"There is an error in response {response}")
+            item["UsersByGroup"] = {}
 
+        db.update("storage", item, self.id)
+        item["metadata"] = json.loads(self.metadata)
+        item["id"] = self.id
         yield item
 
